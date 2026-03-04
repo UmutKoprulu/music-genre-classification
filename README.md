@@ -1,83 +1,120 @@
-# Music Genre Classification (Deep Learning + Classical Baselines)
+# Music Genre Classification
 
-This repository contains the project report for **Music Genre Classification: A Deep Learning Approach**, comparing classical handcrafted-feature pipelines with spectrogram-based deep models across **GTZAN** and **Free Music Archive (FMA)** subsets. :contentReference[oaicite:0]{index=0}
+This repository contains the project report for a **Music Genre Classification** study comparing classical machine learning baselines with deep learning approaches on music datasets.
 
-📄 **Report (PDF):**
-- `report/Music_Genre_Classification___Progress_Report.pdf` (add the PDF here)
+The project explores how different audio representations and model architectures affect classification performance across multiple datasets.
 
-> **Code note:** This repository currently shares the **report only** (no training/inference code). The report documents datasets, preprocessing, model architectures, and experimental results. :contentReference[oaicite:1]{index=1}
+📄 **Project Report:**  
+[Music_Genre_Classification___Progress_Report.pdf](Music_Genre_Classification___Progress_Report.pdf)
 
----
-
-## Project Summary
-
-Music genre classification is challenging in real-world settings due to **label noise**, **overlapping genre boundaries**, and **class imbalance**. This project evaluates:
-- **Handcrafted feature baselines** (FMA official feature set) with Logistic Regression and PCA + RBF-SVM
-- **Log-mel spectrogram deep models**: a lightweight CNN and a **CNN–Transformer** that aggregates multiple segments per track :contentReference[oaicite:2]{index=2}
+> Note: This repository contains the **project report only**. Training and inference code are not included.
 
 ---
 
-## Datasets
+# Project Overview
 
-- **GTZAN**: 1,000 clips, 10 genres, 30s each @ 22,050 Hz :contentReference[oaicite:3]{index=3}  
-- **FMA-small**: 8,000 tracks, 8 balanced genres :contentReference[oaicite:4]{index=4}  
-- **FMA-medium**: 25,000 tracks, 16 genres, strongly imbalanced :contentReference[oaicite:5]{index=5}
+Music genre classification is a common problem in music information retrieval (MIR).  
+However, it becomes challenging in practice due to:
 
----
+- Label noise in real-world datasets
+- Overlapping genre characteristics
+- Class imbalance between genres
 
-## Methods (High-Level)
-
-### Audio Representation
-- **Log-mel spectrograms** (128 mel bands), hop length 512, FFT size 1024/2048, amplitude→dB :contentReference[oaicite:6]{index=6}  
-- Segment-based setup for CNN–Transformer (e.g., 3s or 5s segments; multiple segments per track) :contentReference[oaicite:7]{index=7}
-
-### Normalization
-- Per-sample (local) z-score
-- Global z-score (dataset-wide statistics)
-- No normalization :contentReference[oaicite:8]{index=8}
-
-### Models
-- **Handcrafted baselines**: Logistic Regression; PCA + RBF-SVM :contentReference[oaicite:9]{index=9}  
-- **CNN**: lightweight spectrogram CNN (~1.2M params) :contentReference[oaicite:10]{index=10}  
-- **CNN–Transformer**: CNN encoder per segment + Transformer aggregator with a [CLS] token :contentReference[oaicite:11]{index=11}
-
-### Training (Deep Models)
-- AdamW, LR 2e-4, weight decay 1e-3
-- ReduceLROnPlateau, gradient clipping, mixed precision (FP16), early stopping :contentReference[oaicite:12]{index=12}
+This project investigates different approaches to classify music tracks using both **classical machine learning** and **deep learning models**.
 
 ---
 
-## Key Results (from the report)
+# Datasets
 
-### GTZAN (clean/small)
-- **PCA + RBF-SVM (handcrafted)**: **0.919 accuracy**
-- **CNN (log-mel)**: **0.750 accuracy** :contentReference[oaicite:13]{index=13}
+The experiments use the following widely used music datasets:
 
-### FMA-small (noisier/balanced)
-- Logistic Regression: **0.537**
-- PCA + RBF-SVM: **~0.580**
-- CNN (log-mel): **0.591** :contentReference[oaicite:14]{index=14}
+**GTZAN**
+- 1000 audio clips
+- 10 genres
+- 30 seconds per track
+- Sample rate: 22,050 Hz
 
-### FMA-medium (noisy/long-tailed)
-- Best CNN–Transformer config reported: **0.692 accuracy**, **Macro F1 = 0.394**, **Weighted F1 = 0.697** :contentReference[oaicite:15]{index=15}  
-- Silent-segment filtering had a large impact (disabling it reduced accuracy substantially). :contentReference[oaicite:16]{index=16}
+**FMA-small**
+- 8,000 tracks
+- 8 balanced genres
+
+**FMA-medium**
+- 25,000 tracks
+- 16 genres
+- Highly imbalanced class distribution
 
 ---
 
-## Repository Structure (suggested)
+# Methods
+
+## Audio Representation
+
+Audio tracks are converted into **log-mel spectrograms**, which are commonly used for deep learning on audio signals.
+
+Configuration:
+- 128 mel frequency bands
+- Hop length: 512
+- FFT size: 1024 / 2048
+- Amplitude converted to decibel scale
+
+For sequence modeling, tracks are also split into **short segments** which are later aggregated by a transformer model.
 
 ---
 
-## Authors / Contributions
+## Models
 
-- Yunus Emre Ulusoy 
-- Semih Dogan 
+The project compares both classical and deep learning approaches.
+
+### Classical Machine Learning
+- Logistic Regression
+- PCA + RBF-SVM
+
+These models use **handcrafted audio features** from the FMA dataset.
+
+### Deep Learning
+- Convolutional Neural Network (CNN) operating on spectrograms
+- CNN–Transformer architecture combining convolutional feature extraction with transformer-based sequence aggregation
+
+---
+
+# Training Strategy
+
+Deep learning models are trained using:
+
+- **AdamW optimizer**
+- Learning rate: 2e-4
+- Weight decay: 1e-3
+- Gradient clipping
+- Mixed precision training (FP16)
+- Early stopping
+- Learning rate scheduling (ReduceLROnPlateau)
+
+---
+
+# Key Results
+
+### GTZAN
+- PCA + RBF-SVM: **91.9% accuracy**
+- CNN: **75.0% accuracy**
+
+### FMA-small
+- Logistic Regression: **53.7% accuracy**
+- PCA + RBF-SVM: **~58.0% accuracy**
+- CNN: **59.1% accuracy**
+
+### FMA-medium
+- CNN–Transformer: **69.2% accuracy**
+- Macro F1: **0.394**
+- Weighted F1: **0.697**
+
+The experiments show that handcrafted features perform strongly on clean datasets, while deep learning models scale better to larger and noisier datasets.
+
+---
+
+# Authors
+
+- Yunus Emre Ulusoy  
+- Semih Dogan  
 - Alp Eren Gül  
-- Burak Ala
-- Umut Köprülü 
-
----
-
-## References
-
-See the report bibliography for full citations (GTZAN, FMA, and related deep learning baselines). :contentReference[oaicite:18]{index=18}
+- Burak Ala  
+- Umut Köprülü
